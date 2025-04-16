@@ -24,7 +24,7 @@ fn main() {
         .add_plugins((
             DefaultPlugins.set(WindowPlugin {
                 primary_window: Some(Window {
-                    title: "Retro Side-Scroller".into(),
+                    title: "Scienteer".into(),
                     resolution: (WINDOW_WIDTH, WINDOW_HEIGHT).into(),
                     ..default()
                 }),
