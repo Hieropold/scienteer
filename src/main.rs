@@ -4,10 +4,10 @@ use bevy_pixel_camera::{PixelCameraPlugin, PixelZoom};
 const WINDOW_WIDTH: f32 = 800.0;
 const WINDOW_HEIGHT: f32 = 600.0;
 const PLAYER_SPEED: f32 = 100.0;
-const JUMP_FORCE: f32 = 400.0;  // Increased from 300
-const GRAVITY: f32 = -600.0;    // Reduced from -800
+const JUMP_FORCE: f32 = 300.0;  // Increased from 300
+const GRAVITY: f32 = -800.0;    // Reduced from -800
 const SPRITE_SIZE: f32 = 32.0;
-const CHEMICAL_PROJECTILE_SPEED: f32 = PLAYER_SPEED * 3.0;
+const CHEMICAL_PROJECTILE_SPEED: f32 = PLAYER_SPEED * 2.0;
 const CHEMICAL_PROJECTILE_SIZE: f32 = 16.0;
 const CHEMICAL_PROJECTILE_COOLDOWN: f32 = 0.6;
 const CHEMICAL_PROJECTILE_ROTATION_SPEED: f32 = 2.0; // Radians per second
@@ -26,6 +26,9 @@ struct Velocity {
 
 #[derive(Component)]
 struct ChemicalProjectile;
+
+#[derive(Component)]
+struct Background;
 
 fn main() {
     App::new()
@@ -60,6 +63,20 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn((
         Camera2dBundle::default(),
         PixelZoom::FitSize { width: 320, height: 240 },
+    ));
+
+    // Background
+    commands.spawn((
+        SpriteBundle {
+            texture: asset_server.load("levels/lab.png"),
+            transform: Transform::from_xyz(0.0, 0.0, -1.0),  // Place behind other elements
+            sprite: Sprite {
+                custom_size: Some(Vec2::new(320.0, 240.0)),  // Match the PixelZoom dimensions
+                ..default()
+            },
+            ..default()
+        },
+        Background,
     ));
 
     // Player with sprite
