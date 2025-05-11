@@ -3,12 +3,12 @@ use bevy_pixel_camera::{PixelCameraPlugin, PixelZoom};
 
 const WINDOW_WIDTH: f32 = 800.0;
 const WINDOW_HEIGHT: f32 = 600.0;
-const PLAYER_SPEED: f32 = 150.0;
+const PLAYER_SPEED: f32 = 50.0;
 const JUMP_FORCE: f32 = 400.0;  // Increased from 300
 const GRAVITY: f32 = -600.0;    // Reduced from -800
 const SPRITE_SIZE: f32 = 32.0;
-const FIREBALL_SPEED: f32 = PLAYER_SPEED * 3.0;
-const FIREBALL_SIZE: f32 = 8.0;
+const FIREBALL_SPEED: f32 = PLAYER_SPEED * 2.0;
+const FIREBALL_SIZE: f32 = 16.0;
 const FIREBALL_COOLDOWN: f32 = 0.6;
 
 #[derive(Component)]
@@ -144,6 +144,7 @@ fn shoot_fireball(
     mut commands: Commands,
     keyboard: Res<Input<KeyCode>>,
     time: Res<Time>,
+    asset_server: Res<AssetServer>,
     mut query: Query<(&mut Player, &Transform)>,
 ) {
     let (mut player, transform) = query.single_mut();
@@ -154,9 +155,10 @@ fn shoot_fireball(
         
         commands.spawn((
             SpriteBundle {
+                texture: asset_server.load("fireball.png"),
                 sprite: Sprite {
-                    color: Color::RED,
                     custom_size: Some(Vec2::new(FIREBALL_SIZE, FIREBALL_SIZE)),
+                    flip_x: !player.facing_right,
                     ..default()
                 },
                 transform: Transform::from_xyz(
