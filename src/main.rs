@@ -3,13 +3,14 @@ use bevy_pixel_camera::{PixelCameraPlugin, PixelZoom};
 
 const WINDOW_WIDTH: f32 = 800.0;
 const WINDOW_HEIGHT: f32 = 600.0;
-const PLAYER_SPEED: f32 = 50.0;
+const PLAYER_SPEED: f32 = 100.0;
 const JUMP_FORCE: f32 = 400.0;  // Increased from 300
 const GRAVITY: f32 = -600.0;    // Reduced from -800
 const SPRITE_SIZE: f32 = 32.0;
-const FIREBALL_SPEED: f32 = PLAYER_SPEED * 2.0;
-const FIREBALL_SIZE: f32 = 16.0;
-const FIREBALL_COOLDOWN: f32 = 0.6;
+const CHEMICAL_PROJECTILE_SPEED: f32 = PLAYER_SPEED * 3.0;
+const CHEMICAL_PROJECTILE_SIZE: f32 = 16.0;
+const CHEMICAL_PROJECTILE_COOLDOWN: f32 = 0.6;
+const CHEMICAL_PROJECTILE_ROTATION_SPEED: f32 = 2.0; // Radians per second
 
 #[derive(Component)]
 struct Player {
@@ -24,7 +25,7 @@ struct Velocity {
 }
 
 #[derive(Component)]
-struct Fireball;
+struct ChemicalProjectile;
 
 fn main() {
     App::new()
@@ -46,8 +47,9 @@ fn main() {
                 player_movement,
                 apply_gravity,
                 apply_velocity,
-                shoot_fireball,
-                cleanup_fireballs,
+                shoot_chemical,
+                cleanup_projectiles,
+                rotate_projectiles,
             ).chain(),
         )
         .run();
@@ -140,7 +142,7 @@ fn apply_velocity(mut query: Query<(&Velocity, &mut Transform)>, time: Res<Time>
     }
 }
 
-fn shoot_fireball(
+fn shoot_chemical(
     mut commands: Commands,
     keyboard: Res<Input<KeyCode>>,
     time: Res<Time>,
@@ -150,14 +152,14 @@ fn shoot_fireball(
     let (mut player, transform) = query.single_mut();
     
     if (keyboard.pressed(KeyCode::ControlLeft) || keyboard.pressed(KeyCode::ControlRight)) 
-        && time.elapsed_seconds() >= player.last_shot_time + FIREBALL_COOLDOWN {
+        && time.elapsed_seconds() >= player.last_shot_time + CHEMICAL_PROJECTILE_COOLDOWN {
         let direction = if player.facing_right { 1.0 } else { -1.0 };
         
         commands.spawn((
             SpriteBundle {
-                texture: asset_server.load("fireball.png"),
+                texture: asset_server.load("bottle.png"),
                 sprite: Sprite {
-                    custom_size: Some(Vec2::new(FIREBALL_SIZE, FIREBALL_SIZE)),
+                    custom_size: Some(Vec2::new(CHEMICAL_PROJECTILE_SIZE, CHEMICAL_PROJECTILE_SIZE)),
                     flip_x: !player.facing_right,
                     ..default()
                 },
@@ -168,9 +170,9 @@ fn shoot_fireball(
                 ),
                 ..default()
             },
-            Fireball,
+            ChemicalProjectile,
             Velocity {
-                speed: Vec2::new(FIREBALL_SPEED * direction, 0.0),
+                speed: Vec2::new(CHEMICAL_PROJECTILE_SPEED * direction, 0.0),
             },
         ));
         
@@ -178,14 +180,23 @@ fn shoot_fireball(
     }
 }
 
-fn cleanup_fireballs(
+fn cleanup_projectiles(
     mut commands: Commands,
-    query: Query<(Entity, &Transform), With<Fireball>>,
+    query: Query<(Entity, &Transform), With<ChemicalProjectile>>,
 ) {
     for (entity, transform) in query.iter() {
         if transform.translation.x < -WINDOW_WIDTH / 2.0 
             || transform.translation.x > WINDOW_WIDTH / 2.0 {
             commands.entity(entity).despawn();
         }
+    }
+}
+
+fn rotate_projectiles(
+    time: Res<Time>,
+    mut query: Query<&mut Transform, With<ChemicalProjectile>>,
+) {
+    for mut transform in query.iter_mut() {
+        transform.rotate_z(CHEMICAL_PROJECTILE_ROTATION_SPEED * time.delta_seconds());
     }
 }
