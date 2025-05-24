@@ -83,7 +83,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn((
         SpriteBundle {
             texture: asset_server.load("scientist.png"),
-            transform: Transform::from_xyz(0.0, SPRITE_SIZE / 2.0, 0.0),  // Start slightly above ground
+            transform: Transform::from_xyz(0.0, -90.0, 0.0),  // Position at 25% from bottom of screen (240 * 0.25 - 240/2 = -90)
             sprite: Sprite {
                 custom_size: Some(Vec2::new(SPRITE_SIZE, SPRITE_SIZE)),
                 ..default()
@@ -138,7 +138,7 @@ fn apply_gravity(
     velocity.speed.y += GRAVITY * time.delta_seconds();
 
     // Check if landed (accounting for sprite size)
-    if transform.translation.y <= SPRITE_SIZE / 2.0 && velocity.speed.y <= 0.0 {
+    if transform.translation.y <= -90.0 && velocity.speed.y <= 0.0 {
         velocity.speed.y = 0.0;
         player.is_jumping = false;
     }
@@ -152,9 +152,9 @@ fn apply_velocity(mut query: Query<(&Velocity, &mut Transform)>, time: Res<Time>
         transform.translation.x += velocity.speed.x * delta;
         transform.translation.y += velocity.speed.y * delta;
         
-        // Keep player above ground level (accounting for sprite size)
-        if transform.translation.y < SPRITE_SIZE / 2.0 {
-            transform.translation.y = SPRITE_SIZE / 2.0;
+        // Keep player above ground level
+        if transform.translation.y < -90.0 {
+            transform.translation.y = -90.0;
         }
     }
 }
