@@ -1,3 +1,3 @@
 # scienteer
 
-Playing around with bevy engine.
+Playing around with bevy engine and creating a simple retro-style platformer.
