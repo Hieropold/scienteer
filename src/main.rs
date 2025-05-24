@@ -33,7 +33,9 @@ struct Background;
 fn main() {
     App::new()
         .add_plugins((
-            DefaultPlugins.set(WindowPlugin {
+            DefaultPlugins.set(
+                ImagePlugin::default_nearest() // Use nearest-neighbor filtering for crisp pixel art
+            ).set(WindowPlugin {
                 primary_window: Some(Window {
                     title: "Scienteer".into(),
                     resolution: (WINDOW_WIDTH, WINDOW_HEIGHT).into(),
