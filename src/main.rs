@@ -4,13 +4,17 @@ use bevy_pixel_camera::{PixelCameraPlugin, PixelZoom};
 const WINDOW_WIDTH: f32 = 800.0;
 const WINDOW_HEIGHT: f32 = 600.0;
 const PLAYER_SPEED: f32 = 100.0;
-const JUMP_FORCE: f32 = 300.0;  // Increased from 300
-const GRAVITY: f32 = -800.0;    // Reduced from -800
+const JUMP_FORCE: f32 = 300.0;
+const GRAVITY: f32 = -800.0;
 const SPRITE_SIZE: f32 = 32.0;
 const CHEMICAL_PROJECTILE_SPEED: f32 = PLAYER_SPEED * 2.0;
 const CHEMICAL_PROJECTILE_SIZE: f32 = 16.0;
 const CHEMICAL_PROJECTILE_COOLDOWN: f32 = 0.6;
 const CHEMICAL_PROJECTILE_ROTATION_SPEED: f32 = 2.0; // Radians per second
+const ENEMY_SPEED: f32 = 60.0;
+const ENEMY_SIZE: f32 = 32.0;
+const WAVE_AMPLITUDE: f32 = 50.0;
+const WAVE_FREQUENCY: f32 = 2.0;
 
 #[derive(Component)]
 struct Player {
@@ -29,6 +33,13 @@ struct ChemicalProjectile;
 
 #[derive(Component)]
 struct Background;
+
+#[derive(Component)]
+struct Enemy {
+    start_y: f32,
+    time: f32,
+    moving_right: bool,
+}
 
 fn main() {
     App::new()
@@ -55,6 +66,7 @@ fn main() {
                 shoot_chemical,
                 cleanup_projectiles,
                 rotate_projectiles,
+                enemy_movement,
             ).chain(),
         )
         .run();
@@ -96,6 +108,25 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             is_jumping: false,
             facing_right: true,
             last_shot_time: 0.0,
+        },
+        Velocity { speed: Vec2::ZERO },
+    ));
+
+    // Enemy
+    commands.spawn((
+        SpriteBundle {
+            texture: asset_server.load("alien.png"),
+            transform: Transform::from_xyz(-WINDOW_WIDTH / 2.0, 0.0, 0.0),
+            sprite: Sprite {
+                custom_size: Some(Vec2::new(ENEMY_SIZE / 2.0, ENEMY_SIZE)),
+                ..default()
+            },
+            ..default()
+        },
+        Enemy {
+            start_y: 0.0,
+            time: 0.0,
+            moving_right: true,
         },
         Velocity { speed: Vec2::ZERO },
     ));
@@ -217,5 +248,33 @@ fn rotate_projectiles(
 ) {
     for mut transform in query.iter_mut() {
         transform.rotate_z(CHEMICAL_PROJECTILE_ROTATION_SPEED * time.delta_seconds());
+    }
+}
+
+fn enemy_movement(
+    time: Res<Time>,
+    mut query: Query<(&mut Transform, &mut Enemy)>,
+) {
+    for (mut transform, mut enemy) in query.iter_mut() {
+        enemy.time += time.delta_seconds();
+        
+        // Calculate vertical position using a sine wave
+        let y_offset = (enemy.time * WAVE_FREQUENCY).sin() * WAVE_AMPLITUDE;
+        transform.translation.y = enemy.start_y + y_offset;
+        
+        // Move horizontally
+        if enemy.moving_right {
+            transform.translation.x += ENEMY_SPEED * time.delta_seconds();
+            if transform.translation.x > WINDOW_WIDTH / 2.0 - ENEMY_SIZE {
+                enemy.moving_right = false;
+                transform.scale.x = -1.0; // Flip sprite to face left
+            }
+        } else {
+            transform.translation.x -= ENEMY_SPEED * time.delta_seconds();
+            if transform.translation.x < -WINDOW_WIDTH / 2.0 + ENEMY_SIZE {
+                enemy.moving_right = true;
+                transform.scale.x = 1.0; // Reset sprite to face right
+            }
+        }
     }
 }
