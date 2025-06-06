@@ -50,7 +50,10 @@ fn main() {
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn((
         Camera2dBundle::default(),
-        PixelZoom::FitSize { width: 320, height: 240 },
+        PixelZoom::FitSize {
+            width: VIRTUAL_WIDTH,
+            height: VIRTUAL_HEIGHT,
+        },
     ));
 
     spawn_background(&mut commands, &asset_server);

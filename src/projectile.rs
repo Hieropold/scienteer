@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use crate::constants::{WINDOW_WIDTH, CHEMICAL_PROJECTILE_ROTATION_SPEED};
 
+/// Projectile shot by the player.
 #[derive(Component)]
 pub struct ChemicalProjectile;
 

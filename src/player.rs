@@ -1,8 +1,18 @@
 use bevy::prelude::*;
-use crate::constants::{PLAYER_SPEED, JUMP_FORCE, GRAVITY, SPRITE_SIZE, CHEMICAL_PROJECTILE_SPEED, CHEMICAL_PROJECTILE_SIZE, CHEMICAL_PROJECTILE_COOLDOWN};
+use crate::constants::{
+    PLAYER_SPEED,
+    JUMP_FORCE,
+    GRAVITY,
+    SPRITE_SIZE,
+    CHEMICAL_PROJECTILE_SPEED,
+    CHEMICAL_PROJECTILE_SIZE,
+    CHEMICAL_PROJECTILE_COOLDOWN,
+    GROUND_LEVEL,
+};
 use crate::movement::Velocity;
 use crate::projectile::ChemicalProjectile;
 
+/// Marker component for the player character.
 #[derive(Component)]
 pub struct Player {
     pub is_jumping: bool,
@@ -14,7 +24,7 @@ pub fn spawn_player(commands: &mut Commands, asset_server: &Res<AssetServer>) {
     commands.spawn((
         SpriteBundle {
             texture: asset_server.load("scientist.png"),
-            transform: Transform::from_xyz(0.0, -90.0, 0.0),
+            transform: Transform::from_xyz(0.0, GROUND_LEVEL, 0.0),
             sprite: Sprite {
                 custom_size: Some(Vec2::new(SPRITE_SIZE, SPRITE_SIZE)),
                 ..default()
@@ -64,7 +74,7 @@ pub fn apply_gravity(
 
     velocity.speed.y += GRAVITY * time.delta_seconds();
 
-    if transform.translation.y <= -90.0 && velocity.speed.y <= 0.0 {
+    if transform.translation.y <= GROUND_LEVEL && velocity.speed.y <= 0.0 {
         velocity.speed.y = 0.0;
         player.is_jumping = false;
     }
