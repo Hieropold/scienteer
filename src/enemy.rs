@@ -2,6 +2,7 @@ use bevy::prelude::*;
 use crate::constants::{WINDOW_WIDTH, ENEMY_SIZE, ENEMY_SPEED, WAVE_AMPLITUDE, WAVE_FREQUENCY};
 use crate::movement::Velocity;
 
+/// Simple enemy that moves horizontally in a wave pattern.
 #[derive(Component)]
 pub struct Enemy {
     pub start_y: f32,
