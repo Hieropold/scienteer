@@ -4,7 +4,18 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-bevy = "0.12"  # Latest stable version
+# Avoid building the audio subsystem, which requires external
+# system libraries not available in the test environment.
+bevy = { version = "0.12", default-features = false, features = [
+    "bevy_asset",
+    "bevy_winit",
+    "bevy_render",
+    "bevy_core_pipeline",
+    "bevy_sprite",
+    "bevy_text",
+    "png",
+    "x11",
+] }
 bevy_pixel_camera = "0.12"  # For pixel-perfect rendering
 
 # Enable optimizations for dependencies
