@@ -1,9 +1,9 @@
 pub const WINDOW_WIDTH: f32 = 800.0;
 pub const WINDOW_HEIGHT: f32 = 600.0;
 /// Width of the pixel-perfect camera target.
-pub const VIRTUAL_WIDTH: u32 = 320;
+pub const VIRTUAL_WIDTH: i32 = 320;
 /// Height of the pixel-perfect camera target.
-pub const VIRTUAL_HEIGHT: u32 = 240;
+pub const VIRTUAL_HEIGHT: i32 = 240;
 /// Y coordinate that represents the ground level.
 pub const GROUND_LEVEL: f32 = -90.0;
 pub const PLAYER_SPEED: f32 = 100.0;
